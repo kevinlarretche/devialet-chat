@@ -46,7 +46,7 @@
     align-items: center;
     justify-content: space-between;
     flex-shrink: 0;
-    z-index: 10;
+    z-index: 50;
   }
 
   .header-left {
@@ -461,6 +461,7 @@
   /* ── LANGUAGE SELECTOR ── */
   .lang-wrapper {
     position: relative;
+    z-index: 100;
   }
 
   .lang-dropdown {
@@ -476,7 +477,8 @@
     visibility: hidden;
     transform: translateY(-4px);
     transition: all 0.2s ease;
-    z-index: 100;
+    z-index: 200;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
   }
 
   .lang-dropdown.open {
@@ -564,12 +566,20 @@
           <span class="lang-flag">FR</span> Français
           <span class="lang-check">&#10003;</span>
         </button>
+        <button class="lang-option" data-lang="es" data-welcome="Bienvenido al soporte de Devialet. Estoy aquí para ayudarte con tu Phantom, Mania o Gemini. ¿En qué puedo ayudarte hoy?" data-placeholder="Pregunta lo que quieras sobre tu Devialet...">
+          <span class="lang-flag">ES</span> Español
+          <span class="lang-check">&#10003;</span>
+        </button>
         <button class="lang-option" data-lang="zh" data-welcome="歡迎來到 Devialet 支援中心。我可以協助您解決 Phantom、Mania 或 Gemini 的任何問題。請問有什麼需要幫助的嗎？" data-placeholder="詢問任何關於您的 Devialet 的問題...">
           <span class="lang-flag">中</span> 中文
           <span class="lang-check">&#10003;</span>
         </button>
         <button class="lang-option" data-lang="ja" data-welcome="Devialet サポートへようこそ。Phantom、Mania、Gemini についてお手伝いいたします。ご質問をどうぞ。" data-placeholder="Devialetについて何でもお聞きください...">
           <span class="lang-flag">JP</span> 日本語
+          <span class="lang-check">&#10003;</span>
+        </button>
+        <button class="lang-option" data-lang="ko" data-welcome="Devialet 지원에 오신 것을 환영합니다. Phantom, Mania, Gemini에 대해 도움을 드리겠습니다. 무엇을 도와드릴까요?" data-placeholder="Devialet에 대해 무엇이든 물어보세요...">
+          <span class="lang-flag">KR</span> 한국어
           <span class="lang-check">&#10003;</span>
         </button>
       </div>
@@ -625,6 +635,7 @@ const CONFIG = {
 };
 
 let chatId = 'dev_' + Math.random().toString(36).substr(2, 9);
+let currentLang = 'en';
 const chat = document.getElementById('chat');
 const input = document.getElementById('input');
 const sendWrapper = document.getElementById('send-wrapper');
@@ -741,7 +752,7 @@ async function handleSend(textOverride) {
     const res = await fetch(CONFIG.webhook, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: text, productId, chatId })
+      body: JSON.stringify({ message: text, productId, chatId, language: currentLang })
     });
     const data = await res.json();
     if (document.getElementById('typing')) document.getElementById('typing').remove();
@@ -777,6 +788,44 @@ document.getElementById('restart-btn').onclick = () => {
   chatId = 'dev_' + Math.random().toString(36).substr(2, 9);
   init();
 };
+
+// ── LANGUAGE SELECTOR ──
+const langBtn = document.getElementById('lang-btn');
+const langDropdown = document.getElementById('lang-dropdown');
+
+langBtn.onclick = (e) => {
+  e.stopPropagation();
+  langDropdown.classList.toggle('open');
+};
+
+document.addEventListener('click', () => {
+  langDropdown.classList.remove('open');
+});
+
+langDropdown.addEventListener('click', (e) => {
+  e.stopPropagation();
+});
+
+document.querySelectorAll('.lang-option').forEach(opt => {
+  opt.onclick = () => {
+    const lang = opt.dataset.lang;
+    const welcome = opt.dataset.welcome;
+    const placeholder = opt.dataset.placeholder;
+
+    currentLang = lang;
+
+    document.querySelectorAll('.lang-option').forEach(o => o.classList.remove('active'));
+    opt.classList.add('active');
+
+    CONFIG.welcome = welcome;
+    input.placeholder = placeholder;
+
+    langDropdown.classList.remove('open');
+
+    chatId = 'dev_' + Math.random().toString(36).substr(2, 9);
+    init();
+  };
+});
 
 init();
 </script>
