@@ -431,7 +431,32 @@
     margin-top: 14px;
   }
 
-  .powered-by span { color: var(--text-secondary); }
+  .powered-by a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.25s ease;
+    position: relative;
+  }
+
+  .powered-by a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: var(--text-secondary);
+    transition: width 0.3s ease;
+  }
+
+  .powered-by a:hover {
+    color: var(--text-primary);
+  }
+
+  .powered-by a:hover::after {
+    width: 100%;
+    background: var(--text-primary);
+  }
 </style>
 </head>
 <body>
@@ -488,7 +513,7 @@
       </button>
     </div>
   </div>
-  <div class="powered-by">Powered by <span>SQU</span></div>
+  <div class="powered-by">Powered by <a href="https://squ-ai.vercel.app/" target="_blank" rel="noopener">SQU</a></div>
 </div>
 
 <script>
