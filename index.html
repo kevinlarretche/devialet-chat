@@ -185,7 +185,6 @@
     font-weight: 400;
   }
 
-  /* Markdown inside bot messages */
   .message.bot strong { font-weight: 600; color: white; }
   .message.bot em { font-style: italic; color: var(--text-secondary); }
   .message.bot ul { padding-left: 16px; margin: 8px 0; }
@@ -226,9 +225,7 @@
     filter: brightness(0.9);
   }
 
-  .product-card-body {
-    padding: 14px 16px 16px;
-  }
+  .product-card-body { padding: 14px 16px 16px; }
 
   .product-card-label {
     font-size: 8px;
@@ -364,6 +361,14 @@
     color: var(--text-muted);
   }
 
+  /* ── SEND BUTTON WITH WAVE EFFECT ── */
+  .send-btn-wrapper {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+  }
+
   .send-btn {
     background: white;
     border: none;
@@ -376,9 +381,45 @@
     justify-content: center;
     transition: opacity 0.2s ease;
     flex-shrink: 0;
+    position: relative;
+    z-index: 2;
   }
   .send-btn:hover { opacity: 0.85; }
-  .send-btn svg { fill: black; width: 16px; height: 16px; }
+
+  /* Sound wave ripples */
+  .wave-ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 40px;
+    height: 40px;
+    border: 1px solid rgba(255,255,255,0);
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(1);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .send-btn-wrapper.rippling .wave-ring {
+    animation: waveExpand 0.7s ease-out forwards;
+  }
+  .send-btn-wrapper.rippling .wave-ring:nth-child(2) {
+    animation-delay: 0.1s;
+  }
+  .send-btn-wrapper.rippling .wave-ring:nth-child(3) {
+    animation-delay: 0.2s;
+  }
+
+  @keyframes waveExpand {
+    0% {
+      transform: translate(-50%, -50%) scale(1);
+      border-color: rgba(255,255,255,0.4);
+    }
+    100% {
+      transform: translate(-50%, -50%) scale(2.8);
+      border-color: rgba(255,255,255,0);
+    }
+  }
 
   .powered-by {
     text-align: center;
@@ -428,14 +469,24 @@
   <div class="quick-replies" id="quick-replies"></div>
   <div class="input-wrapper">
     <input type="text" id="input" placeholder="Ask anything about your Devialet..." autocomplete="off">
-    <button class="send-btn" id="send-btn" title="Send">
-      <!-- Musical note icon -->
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="black" xmlns="http://www.w3.org/2000/svg">
-        <path d="M9 18V5l12-2v13" stroke="black" stroke-width="0" fill="none"/>
-        <path d="M21 3L9 5v13.5A3 3 0 1 0 12 21V9.8l9-1.5V3z" fill="black"/>
-        <circle cx="6" cy="18.5" r="3" fill="black"/>
-      </svg>
-    </button>
+    <div class="send-btn-wrapper" id="send-wrapper">
+      <div class="wave-ring"></div>
+      <div class="wave-ring"></div>
+      <div class="wave-ring"></div>
+      <button class="send-btn" id="send-btn" title="Send">
+        <!-- Minimal sound wave / audio icon -->
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Center bar -->
+          <rect x="11" y="4" width="2" height="16" rx="1" fill="black"/>
+          <!-- Left bars -->
+          <rect x="7" y="7" width="2" height="10" rx="1" fill="black"/>
+          <rect x="3" y="9" width="2" height="6" rx="1" fill="black"/>
+          <!-- Right bars -->
+          <rect x="15" y="7" width="2" height="10" rx="1" fill="black"/>
+          <rect x="19" y="9" width="2" height="6" rx="1" fill="black"/>
+        </svg>
+      </button>
+    </div>
   </div>
   <div class="powered-by">Powered by <span>SQU</span></div>
 </div>
@@ -454,8 +505,15 @@ const CONFIG = {
 let chatId = 'dev_' + Math.random().toString(36).substr(2, 9);
 const chat = document.getElementById('chat');
 const input = document.getElementById('input');
+const sendWrapper = document.getElementById('send-wrapper');
 
-// ── MARKDOWN ──
+function triggerWave() {
+  sendWrapper.classList.remove('rippling');
+  void sendWrapper.offsetWidth;
+  sendWrapper.classList.add('rippling');
+  setTimeout(() => sendWrapper.classList.remove('rippling'), 800);
+}
+
 function parseMarkdown(text) {
   let html = text
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -479,7 +537,6 @@ function parseMarkdown(text) {
   }).filter(Boolean).join('\n');
 }
 
-// ── PRODUCT CARD ──
 function buildProductCard(card) {
   const div = document.createElement('div');
   div.className = 'product-card';
@@ -495,7 +552,6 @@ function buildProductCard(card) {
   return div;
 }
 
-// ── ADD MESSAGE ──
 function addMsg(text, type, card = null) {
   const wrapper = document.createElement('div');
   wrapper.className = `message-wrapper ${type}`;
@@ -530,7 +586,6 @@ function addMsg(text, type, card = null) {
   chat.scrollTop = chat.scrollHeight;
 }
 
-// ── TYPING ──
 function showTyping() {
   const div = document.createElement('div');
   div.id = 'typing';
@@ -550,13 +605,13 @@ function showTyping() {
   chat.scrollTop = chat.scrollHeight;
 }
 
-// ── SEND ──
 async function handleSend(textOverride) {
   const text = textOverride || input.value.trim();
   if (!text) return;
   input.value = '';
   document.getElementById('quick-replies').style.display = 'none';
 
+  triggerWave();
   addMsg(text, 'user');
   showTyping();
 
@@ -579,7 +634,6 @@ async function handleSend(textOverride) {
   }
 }
 
-// ── INIT ──
 function init() {
   chat.innerHTML = '';
   addMsg(CONFIG.welcome, 'bot');
