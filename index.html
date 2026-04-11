@@ -457,6 +457,76 @@
     width: 100%;
     background: var(--text-primary);
   }
+
+  /* ── LANGUAGE SELECTOR ── */
+  .lang-wrapper {
+    position: relative;
+  }
+
+  .lang-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-hover);
+    border-radius: 6px;
+    overflow: hidden;
+    min-width: 150px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-4px);
+    transition: all 0.2s ease;
+    z-index: 100;
+  }
+
+  .lang-dropdown.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .lang-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 14px;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-align: left;
+  }
+
+  .lang-option:hover {
+    background: var(--accent-dim);
+    color: var(--text-primary);
+  }
+
+  .lang-option.active {
+    color: var(--text-primary);
+  }
+
+  .lang-option .lang-flag {
+    font-size: 14px;
+    line-height: 1;
+  }
+
+  .lang-option .lang-check {
+    margin-left: auto;
+    opacity: 0;
+    font-size: 10px;
+    color: var(--text-muted);
+  }
+
+  .lang-option.active .lang-check {
+    opacity: 1;
+  }
 </style>
 </head>
 <body>
@@ -477,6 +547,33 @@
     </div>
   </div>
   <div class="header-actions">
+    <div class="lang-wrapper">
+      <button class="icon-btn" id="lang-btn" title="Language">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M2 12h20"/>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+      </button>
+      <div class="lang-dropdown" id="lang-dropdown">
+        <button class="lang-option active" data-lang="en" data-welcome="Welcome to Devialet Support. I'm here to help you with your Phantom, Mania, or Gemini. How can I assist you today?" data-placeholder="Ask anything about your Devialet...">
+          <span class="lang-flag">EN</span> English
+          <span class="lang-check">&#10003;</span>
+        </button>
+        <button class="lang-option" data-lang="fr" data-welcome="Bienvenue chez Devialet Support. Je suis là pour vous aider avec votre Phantom, Mania ou Gemini. Comment puis-je vous aider ?" data-placeholder="Posez votre question sur votre Devialet...">
+          <span class="lang-flag">FR</span> Français
+          <span class="lang-check">&#10003;</span>
+        </button>
+        <button class="lang-option" data-lang="zh" data-welcome="歡迎來到 Devialet 支援中心。我可以協助您解決 Phantom、Mania 或 Gemini 的任何問題。請問有什麼需要幫助的嗎？" data-placeholder="詢問任何關於您的 Devialet 的問題...">
+          <span class="lang-flag">中</span> 中文
+          <span class="lang-check">&#10003;</span>
+        </button>
+        <button class="lang-option" data-lang="ja" data-welcome="Devialet サポートへようこそ。Phantom、Mania、Gemini についてお手伝いいたします。ご質問をどうぞ。" data-placeholder="Devialetについて何でもお聞きください...">
+          <span class="lang-flag">JP</span> 日本語
+          <span class="lang-check">&#10003;</span>
+        </button>
+      </div>
+    </div>
     <button class="icon-btn" id="restart-btn" title="New conversation">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
