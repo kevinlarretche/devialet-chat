@@ -625,17 +625,62 @@
 
 <script>
 const params = new URLSearchParams(window.location.search);
-const productId = params.get('product') || 'DEV-PU108';
+const productId = params.get('product') || 'DEV-PHANTOM';
 
 const CONFIG = {
   bot: "Devialet",
-  webhook: "https://n8n.srv1208833.hstgr.cloud/webhook/devialet_chat",
+  webhook: "https://n8n.srv1208833.hstgr.cloud/webhook/devialet-chat",
   welcome: "Welcome to Devialet Support. I'm here to help you with your Phantom, Mania, or Gemini. How can I assist you today?",
   questions: ["Setup Guide", "Connectivity", "Sound Settings", "Warranty & Repairs", "Compare Products"]
 };
 
 let chatId = 'dev_' + Math.random().toString(36).substr(2, 9);
 let currentLang = 'en';
+
+// Auto-detect country from browser locale/timezone
+function detectCountry() {
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+    const locale = navigator.language || 'en-US';
+    const regionFromLocale = locale.split('-')[1] || '';
+
+    // Timezone → country mapping for key Devialet markets
+    const tzCountry = {
+      'Asia/Hong_Kong': 'HK', 'Asia/Taipei': 'TW', 'Asia/Tokyo': 'JP',
+      'Asia/Seoul': 'KR', 'Asia/Singapore': 'SG', 'Asia/Shanghai': 'CN',
+      'Asia/Bangkok': 'TH', 'Asia/Jakarta': 'ID',
+      'Europe/Paris': 'FR', 'Europe/London': 'GB', 'Europe/Berlin': 'DE',
+      'Europe/Madrid': 'ES', 'Europe/Rome': 'IT', 'Europe/Zurich': 'CH',
+      'Europe/Amsterdam': 'NL', 'Europe/Brussels': 'BE',
+      'America/New_York': 'US', 'America/Chicago': 'US',
+      'America/Los_Angeles': 'US', 'America/Denver': 'US',
+      'America/Toronto': 'CA', 'America/Vancouver': 'CA',
+      'America/Mexico_City': 'MX', 'America/Sao_Paulo': 'BR',
+      'Australia/Sydney': 'AU', 'Australia/Melbourne': 'AU',
+      'Pacific/Auckland': 'NZ',
+    };
+
+    return tzCountry[tz] || regionFromLocale.toUpperCase() || 'US';
+  } catch(e) {
+    return 'US';
+  }
+}
+
+// Country → currency mapping
+function getCurrency(country) {
+  const map = {
+    'US': 'USD', 'CA': 'CAD', 'GB': 'GBP',
+    'FR': 'EUR', 'DE': 'EUR', 'ES': 'EUR', 'IT': 'EUR',
+    'NL': 'EUR', 'BE': 'EUR', 'CH': 'CHF',
+    'HK': 'HKD', 'TW': 'TWD', 'JP': 'JPY', 'KR': 'KRW',
+    'SG': 'SGD', 'CN': 'CNY', 'TH': 'THB', 'ID': 'IDR',
+    'AU': 'AUD', 'NZ': 'NZD', 'MX': 'MXN', 'BR': 'BRL',
+  };
+  return map[country] || 'USD';
+}
+
+const userCountry = detectCountry();
+const userCurrency = getCurrency(userCountry);
 const chat = document.getElementById('chat');
 const input = document.getElementById('input');
 const sendWrapper = document.getElementById('send-wrapper');
@@ -752,7 +797,7 @@ async function handleSend(textOverride) {
     const res = await fetch(CONFIG.webhook, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: text, productId, chatId, language: currentLang })
+      body: JSON.stringify({ message: text, productId, chatId, language: currentLang, country: userCountry, currency: userCurrency })
     });
     const data = await res.json();
     if (document.getElementById('typing')) document.getElementById('typing').remove();
