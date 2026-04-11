@@ -212,20 +212,40 @@
     border: 1px solid var(--border);
     border-radius: 12px;
     overflow: hidden;
-    max-width: 260px;
+    max-width: 280px;
     transition: border-color 0.2s ease;
   }
   .product-card:hover { border-color: var(--border-hover); }
 
-  .product-card img {
+  .product-card-img {
     width: 100%;
-    height: 150px;
-    object-fit: cover;
-    display: block;
-    filter: brightness(0.9);
+    height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #141414;
+    position: relative;
+    overflow: hidden;
   }
 
-  .product-card-body { padding: 14px 16px 16px; }
+  .product-card-img img {
+    max-width: 85%;
+    max-height: 130px;
+    object-fit: contain;
+    display: block;
+    filter: brightness(0.95);
+  }
+
+  .product-card-img .img-fallback {
+    display: none;
+    color: var(--text-muted);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .product-card-body { padding: 16px 18px 18px; }
 
   .product-card-label {
     font-size: 8px;
@@ -233,24 +253,24 @@
     letter-spacing: 0.18em;
     text-transform: uppercase;
     color: var(--text-muted);
-    margin-bottom: 6px;
+    margin-bottom: 8px;
   }
 
   .product-card-name {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
     color: var(--text-primary);
     letter-spacing: 0.02em;
     line-height: 1.3;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
   }
 
   .product-card-price {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 300;
     color: var(--text-primary);
     letter-spacing: -0.01em;
-    margin: 8px 0 14px;
+    margin: 10px 0 16px;
   }
 
   .product-card-btn {
@@ -258,7 +278,7 @@
     background: white;
     color: black;
     text-align: center;
-    padding: 10px 16px;
+    padding: 11px 16px;
     border-radius: 4px;
     font-size: 10px;
     font-weight: 700;
@@ -719,9 +739,12 @@ function buildProductCard(card) {
   const div = document.createElement('div');
   div.className = 'product-card';
   div.innerHTML = `
-    <img src="${card.image}" alt="${card.name}" onerror="this.style.display='none'">
+    <div class="product-card-img">
+      <img src="${card.image}" alt="${card.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+      <span class="img-fallback">Devialet</span>
+    </div>
     <div class="product-card-body">
-      <div class="product-card-label">Devialet</div>
+      <div class="product-card-label">Recommended</div>
       <div class="product-card-name">${card.name}</div>
       <div class="product-card-price">${card.price}</div>
       <a href="${card.url}" target="_blank" rel="noopener" class="product-card-btn">Discover</a>
