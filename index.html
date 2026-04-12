@@ -208,7 +208,7 @@
   /* ── PRODUCT CARD ── */
   .product-card {
     margin-top: 12px;
-    background: #eeede8;
+    background: #ffffff;
     border-radius: 10px;
     overflow: hidden;
     max-width: 340px;
@@ -223,7 +223,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #eeede8;
+    background: #ffffff;
     position: relative;
     padding: 12px 20px;
   }
@@ -251,7 +251,7 @@
 
   .product-card-body {
     padding: 14px 18px 16px;
-    background: #eeede8;
+    background: #ffffff;
   }
 
   .product-card-name {
@@ -777,58 +777,69 @@ function buildProductCard(card) {
     'Phantom Ultimate 108 dB': {
       subtitle: 'Full-Body Sound Technology',
       colors: [
-        { hex: '#c9a96e', name: 'Gold Leaf', active: false },
-        { hex: '#e8e4dc', name: 'Light Pearl', active: true },
-        { hex: '#2a3a2e', name: 'Deep Forest', active: false }
-      ]
+        { hex: '#c9a96e', name: 'Gold Leaf', slug: 'phantom-ultimate-108db-opera' },
+        { hex: '#e8e4dc', name: 'Light Pearl', slug: 'phantom-ultimate-108db-light-pearl' },
+        { hex: '#2a3a2e', name: 'Deep Forest', slug: 'phantom-ultimate-108db-deep-forest' }
+      ],
+      basePath: 'phantom-speaker/phantom-ultimate-108db'
     },
     'Phantom Ultimate 98 dB': {
       subtitle: 'Signature Sound, Compact Form',
       colors: [
-        { hex: '#c9a96e', name: 'Gold Leaf', active: false },
-        { hex: '#e8e4dc', name: 'Light Pearl', active: true },
-        { hex: '#2a3a2e', name: 'Deep Forest', active: false }
-      ]
+        { hex: '#c9a96e', name: 'Gold Leaf', slug: 'phantom-ultimate-98db-opera' },
+        { hex: '#e8e4dc', name: 'Light Pearl', slug: 'phantom-ultimate-98db-light-pearl' },
+        { hex: '#2a3a2e', name: 'Deep Forest', slug: 'phantom-ultimate-98db-deep-forest' }
+      ],
+      basePath: 'phantom-speaker/phantom-ultimate-98db'
     },
     'Devialet Mania': {
       subtitle: '360° Stereo Sound',
       colors: [
-        { hex: '#1a1a1a', name: 'Deep Black', active: false },
-        { hex: '#c8c5be', name: 'Light Grey', active: true },
-        { hex: '#d4856a', name: 'Sunset Rose', active: false }
-      ]
+        { hex: '#1a1a1a', name: 'Deep Black', slug: 'devialet-mania-deep-black' },
+        { hex: '#c8c5be', name: 'Light Grey', slug: 'devialet-mania-light-grey' },
+        { hex: '#d4856a', name: 'Sunset Rose', slug: 'devialet-mania-sunset-rose' }
+      ],
+      basePath: 'portable-speakers'
     },
     'Devialet Gemini II': {
       subtitle: 'Adaptive Noise Cancellation',
       colors: [
-        { hex: '#1a1a1a', name: 'Matte Black', active: true },
-        { hex: '#e8e4dc', name: 'Iconic White', active: false }
-      ]
+        { hex: '#1a1a1a', name: 'Matte Black', slug: 'gemini-ii-black' },
+        { hex: '#e8e4dc', name: 'Iconic White', slug: 'gemini-ii-white' }
+      ],
+      basePath: 'true-wireless-earbuds'
     },
     'Devialet Dione': {
       subtitle: 'Dolby Atmos 5.1.2 Soundbar',
       colors: [
-        { hex: '#2a2a2a', name: 'Matte Black', active: true }
-      ]
+        { hex: '#2a2a2a', name: 'Matte Black', slug: 'dione' }
+      ],
+      basePath: 'soundbar'
     },
   };
 
-  const meta = productMeta[card.name] || { subtitle: '', colors: [] };
-  const activeColor = meta.colors.find(c => c.active) || meta.colors[0] || { name: '' };
+  const meta = productMeta[card.name] || { subtitle: '', colors: [], basePath: '' };
+  const activeIdx = meta.colors.findIndex(c => {
+    const url = card.url || '';
+    return url.includes(c.slug);
+  });
+  const defaultIdx = activeIdx >= 0 ? activeIdx : 0;
   const showSwatches = meta.colors.length > 1;
 
-  const swatchesHtml = showSwatches ? `<div class="product-card-colors">${meta.colors.map(c =>
-    `<div class="product-card-swatch${c.active ? ' active' : ''}" style="background:${c.hex};" title="${c.name}"></div>`
+  const cardId = 'pc_' + Math.random().toString(36).substr(2, 6);
+
+  const swatchesHtml = showSwatches ? `<div class="product-card-colors">${meta.colors.map((c, i) =>
+    `<div class="product-card-swatch${i === defaultIdx ? ' active' : ''}" style="background:${c.hex};" title="${c.name}" data-idx="${i}" data-card="${cardId}"></div>`
   ).join('')}</div>` : '';
 
-  // Change image bg in URL if it has a background param
   let imgUrl = card.image;
   if (imgUrl && imgUrl.includes('background=')) {
-    imgUrl = imgUrl.replace(/background=[a-fA-F0-9]+/, 'background=eeede8');
+    imgUrl = imgUrl.replace(/background=[a-fA-F0-9]+/, 'background=ffffff');
   }
 
   const div = document.createElement('div');
   div.className = 'product-card';
+  div.id = cardId;
   div.innerHTML = `
     <div class="product-card-img">
       <img src="${imgUrl}" alt="${card.name}" onerror="this.style.display='none';">
@@ -838,12 +849,37 @@ function buildProductCard(card) {
       <div class="product-card-subtitle">${meta.subtitle}</div>
       ${swatchesHtml}
       <div class="product-card-price-row">
-        <div class="product-card-finish">${activeColor.name}</div>
+        <div class="product-card-finish" id="${cardId}_finish">${meta.colors[defaultIdx] ? meta.colors[defaultIdx].name : ''}</div>
         <div class="product-card-price">${card.price}</div>
       </div>
-      <a href="${card.url}" target="_blank" rel="noopener" class="product-card-btn">Buy</a>
+      <a href="${card.url}" target="_blank" rel="noopener" class="product-card-btn" id="${cardId}_btn">Buy</a>
     </div>
   `;
+
+  // Attach click handlers after DOM insertion
+  setTimeout(() => {
+    const swatches = div.querySelectorAll('.product-card-swatch');
+    swatches.forEach(sw => {
+      sw.addEventListener('click', () => {
+        const idx = parseInt(sw.dataset.idx);
+        const color = meta.colors[idx];
+        if (!color) return;
+
+        // Update active swatch
+        swatches.forEach(s => s.classList.remove('active'));
+        sw.classList.add('active');
+
+        // Update finish name
+        const finishEl = document.getElementById(cardId + '_finish');
+        if (finishEl) finishEl.textContent = color.name;
+
+        // Update buy link
+        const btnEl = document.getElementById(cardId + '_btn');
+        if (btnEl) btnEl.href = 'https://www.devialet.com/en-us/' + meta.basePath + '/' + color.slug + '/';
+      });
+    });
+  }, 50);
+
   return div;
 }
 
