@@ -752,7 +752,7 @@ function buildProductCard(card) {
       <div class="product-card-price-row">
         <div class="product-card-price">${card.price}</div>
       </div>
-      <a href="${card.url}" target="_blank" rel="noopener" class="product-card-btn">Buy</a>
+      ${card.url ? `<a href="${card.url}" target="_blank" rel="noopener" class="product-card-btn">Buy</a>` : ''}
     </div>
   `;
 
