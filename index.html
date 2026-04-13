@@ -228,20 +228,6 @@
     padding: 12px 20px;
   }
 
-  .product-card-img .new-badge {
-    position: absolute;
-    top: 12px;
-    left: 12px;
-    background: #111;
-    color: #fff;
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    padding: 4px 10px;
-    border-radius: 4px;
-  }
-
   .product-card-img img {
     max-width: 85%;
     max-height: 130px;
@@ -270,36 +256,11 @@
     margin-bottom: 12px;
   }
 
-  .product-card-colors {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 10px;
-  }
-
-  .product-card-swatch {
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    border: 1.5px solid #ccc;
-    cursor: pointer;
-    transition: border-color 0.15s ease;
-  }
-
-  .product-card-swatch.active {
-    border-color: #111;
-  }
-
   .product-card-price-row {
     display: flex;
     align-items: baseline;
-    justify-content: space-between;
+    justify-content: flex-end;
     margin-bottom: 12px;
-  }
-
-  .product-card-finish {
-    font-size: 13px;
-    font-weight: 400;
-    color: #111;
   }
 
   .product-card-price {
@@ -663,14 +624,10 @@
       <div class="wave-ring"></div>
       <div class="wave-ring"></div>
       <button class="send-btn" id="send-btn" title="Send">
-        <!-- Minimal sound wave / audio icon -->
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <!-- Center bar -->
           <rect x="11" y="4" width="2" height="16" rx="1" fill="black"/>
-          <!-- Left bars -->
           <rect x="7" y="7" width="2" height="10" rx="1" fill="black"/>
           <rect x="3" y="9" width="2" height="6" rx="1" fill="black"/>
-          <!-- Right bars -->
           <rect x="15" y="7" width="2" height="10" rx="1" fill="black"/>
           <rect x="19" y="9" width="2" height="6" rx="1" fill="black"/>
         </svg>
@@ -694,14 +651,11 @@ const CONFIG = {
 let chatId = 'dev_' + Math.random().toString(36).substr(2, 9);
 let currentLang = 'en';
 
-// Auto-detect country from browser locale/timezone
 function detectCountry() {
   try {
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
     const locale = navigator.language || 'en-US';
     const regionFromLocale = locale.split('-')[1] || '';
-
-    // Timezone → country mapping for key Devialet markets
     const tzCountry = {
       'Asia/Hong_Kong': 'HK', 'Asia/Taipei': 'TW', 'Asia/Tokyo': 'JP',
       'Asia/Seoul': 'KR', 'Asia/Singapore': 'SG', 'Asia/Shanghai': 'CN',
@@ -716,14 +670,12 @@ function detectCountry() {
       'Australia/Sydney': 'AU', 'Australia/Melbourne': 'AU',
       'Pacific/Auckland': 'NZ',
     };
-
     return tzCountry[tz] || regionFromLocale.toUpperCase() || 'US';
   } catch(e) {
     return 'US';
   }
 }
 
-// Country → currency mapping
 function getCurrency(country) {
   const map = {
     'US': 'USD', 'CA': 'CAD', 'GB': 'GBP',
@@ -774,63 +726,14 @@ function parseMarkdown(text) {
 
 function buildProductCard(card) {
   const productMeta = {
-    'Phantom Ultimate 108 dB': {
-      subtitle: 'Full-Body Sound Technology',
-      colors: [
-        { hex: '#c9a96e', name: 'Gold Leaf', slug: 'phantom-ultimate-108db-opera' },
-        { hex: '#e8e4dc', name: 'Light Pearl', slug: 'phantom-ultimate-108db-light-pearl' },
-        { hex: '#2a3a2e', name: 'Deep Forest', slug: 'phantom-ultimate-108db-deep-forest' }
-      ],
-      basePath: 'phantom-speaker/phantom-ultimate-108db'
-    },
-    'Phantom Ultimate 98 dB': {
-      subtitle: 'Signature Sound, Compact Form',
-      colors: [
-        { hex: '#c9a96e', name: 'Gold Leaf', slug: 'phantom-ultimate-98db-opera' },
-        { hex: '#e8e4dc', name: 'Light Pearl', slug: 'phantom-ultimate-98db-light-pearl' },
-        { hex: '#2a3a2e', name: 'Deep Forest', slug: 'phantom-ultimate-98db-deep-forest' }
-      ],
-      basePath: 'phantom-speaker/phantom-ultimate-98db'
-    },
-    'Devialet Mania': {
-      subtitle: '360° Stereo Sound',
-      colors: [
-        { hex: '#1a1a1a', name: 'Deep Black', slug: 'devialet-mania-deep-black' },
-        { hex: '#c8c5be', name: 'Light Grey', slug: 'devialet-mania-light-grey' },
-        { hex: '#d4856a', name: 'Sunset Rose', slug: 'devialet-mania-sunset-rose' }
-      ],
-      basePath: 'portable-speakers'
-    },
-    'Devialet Gemini II': {
-      subtitle: 'Adaptive Noise Cancellation',
-      colors: [
-        { hex: '#1a1a1a', name: 'Matte Black', slug: 'gemini-ii-black' },
-        { hex: '#e8e4dc', name: 'Iconic White', slug: 'gemini-ii-white' }
-      ],
-      basePath: 'true-wireless-earbuds'
-    },
-    'Devialet Dione': {
-      subtitle: 'Dolby Atmos 5.1.2 Soundbar',
-      colors: [
-        { hex: '#2a2a2a', name: 'Matte Black', slug: 'dione' }
-      ],
-      basePath: 'soundbar'
-    },
+    'Phantom Ultimate 108 dB': { subtitle: 'Full-Body Sound Technology' },
+    'Phantom Ultimate 98 dB': { subtitle: 'Signature Sound, Compact Form' },
+    'Devialet Mania': { subtitle: '360° Stereo Sound' },
+    'Devialet Gemini II': { subtitle: 'Adaptive Noise Cancellation' },
+    'Devialet Dione': { subtitle: 'Dolby Atmos 5.1.2 Soundbar' },
   };
 
-  const meta = productMeta[card.name] || { subtitle: '', colors: [], basePath: '' };
-  const activeIdx = meta.colors.findIndex(c => {
-    const url = card.url || '';
-    return url.includes(c.slug);
-  });
-  const defaultIdx = activeIdx >= 0 ? activeIdx : 0;
-  const showSwatches = meta.colors.length > 1;
-
-  const cardId = 'pc_' + Math.random().toString(36).substr(2, 6);
-
-  const swatchesHtml = showSwatches ? `<div class="product-card-colors">${meta.colors.map((c, i) =>
-    `<div class="product-card-swatch${i === defaultIdx ? ' active' : ''}" style="background:${c.hex};" title="${c.name}" data-idx="${i}" data-card="${cardId}"></div>`
-  ).join('')}</div>` : '';
+  const meta = productMeta[card.name] || { subtitle: '' };
 
   let imgUrl = card.image;
   if (imgUrl && imgUrl.includes('background=')) {
@@ -839,7 +742,6 @@ function buildProductCard(card) {
 
   const div = document.createElement('div');
   div.className = 'product-card';
-  div.id = cardId;
   div.innerHTML = `
     <div class="product-card-img">
       <img src="${imgUrl}" alt="${card.name}" onerror="this.style.display='none';">
@@ -847,38 +749,12 @@ function buildProductCard(card) {
     <div class="product-card-body">
       <div class="product-card-name">${card.name}</div>
       <div class="product-card-subtitle">${meta.subtitle}</div>
-      ${swatchesHtml}
       <div class="product-card-price-row">
-        <div class="product-card-finish" id="${cardId}_finish">${meta.colors[defaultIdx] ? meta.colors[defaultIdx].name : ''}</div>
         <div class="product-card-price">${card.price}</div>
       </div>
-      <a href="${card.url}" target="_blank" rel="noopener" class="product-card-btn" id="${cardId}_btn">Buy</a>
+      <a href="${card.url}" target="_blank" rel="noopener" class="product-card-btn">Buy</a>
     </div>
   `;
-
-  // Attach click handlers after DOM insertion
-  setTimeout(() => {
-    const swatches = div.querySelectorAll('.product-card-swatch');
-    swatches.forEach(sw => {
-      sw.addEventListener('click', () => {
-        const idx = parseInt(sw.dataset.idx);
-        const color = meta.colors[idx];
-        if (!color) return;
-
-        // Update active swatch
-        swatches.forEach(s => s.classList.remove('active'));
-        sw.classList.add('active');
-
-        // Update finish name
-        const finishEl = document.getElementById(cardId + '_finish');
-        if (finishEl) finishEl.textContent = color.name;
-
-        // Update buy link
-        const btnEl = document.getElementById(cardId + '_btn');
-        if (btnEl) btnEl.href = 'https://www.devialet.com/en-us/' + meta.basePath + '/' + color.slug + '/';
-      });
-    });
-  }, 50);
 
   return div;
 }
