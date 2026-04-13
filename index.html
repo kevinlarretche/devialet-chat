@@ -648,8 +648,18 @@ const CONFIG = {
   questions: ["Setup Guide", "Connectivity", "Sound Settings", "Warranty & Repairs", "Compare Products"]
 };
 
+const questionsPerLang = {
+  en: ["Setup Guide", "Connectivity", "Sound Settings", "Warranty & Repairs", "Compare Products"],
+  fr: ["Guide d'installation", "Connectivité", "Réglages audio", "Garantie & SAV", "Comparer"],
+  es: ["Guía de instalación", "Conectividad", "Ajustes de sonido", "Garantía", "Comparar"],
+  zh: ["安裝指南", "連線設定", "音效設定", "保固與維修", "產品比較"],
+  ja: ["セットアップ", "接続方法", "サウンド設定", "保証・修理", "製品比較"],
+  ko: ["설치 가이드", "연결 방법", "사운드 설정", "보증 및 수리", "제품 비교"]
+};
+
 let chatId = 'dev_' + Math.random().toString(36).substr(2, 9);
 let currentLang = 'en';
+let isSending = false;
 
 function detectCountry() {
   try {
@@ -814,9 +824,13 @@ function showTyping() {
 
 async function handleSend(textOverride) {
   const text = textOverride || input.value.trim();
-  if (!text) return;
+  if (!text || isSending) return;
   input.value = '';
   document.getElementById('quick-replies').style.display = 'none';
+
+  isSending = true;
+  input.disabled = true;
+  document.getElementById('send-btn').disabled = true;
 
   triggerWave();
   addMsg(text, 'user');
@@ -838,6 +852,11 @@ async function handleSend(textOverride) {
   } catch(e) {
     if (document.getElementById('typing')) document.getElementById('typing').remove();
     addMsg("Connection issue. Please check your network and try again.", 'bot');
+  } finally {
+    isSending = false;
+    input.disabled = false;
+    document.getElementById('send-btn').disabled = false;
+    input.focus();
   }
 }
 
@@ -847,7 +866,8 @@ function init() {
   const qr = document.getElementById('quick-replies');
   qr.innerHTML = '';
   qr.style.display = 'flex';
-  CONFIG.questions.forEach(q => {
+  const questions = questionsPerLang[currentLang] || questionsPerLang.en;
+  questions.forEach(q => {
     const b = document.createElement('button');
     b.className = 'qr-btn';
     b.textContent = q;
