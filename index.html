@@ -638,6 +638,36 @@
 </div>
 
 <script>
+const SUPABASE_URL = 'https://sygsovgnxlrsdqzwhdyc.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_EVCnH60x4JDU1Qlk5uZqBw_i3fmjTan';
+
+const productNameToId = {
+  'Phantom Ultimate 108 dB': 'DEV-PU108',
+  'Phantom Ultimate 98 dB':  'DEV-PU98',
+  'Devialet Mania':           'DEV-MANIA',
+  'Devialet Gemini II':       'DEV-GEM2',
+  'Devialet Dione':           'DEV-DIONE'
+};
+
+async function trackCardEvent(eventType, cardProductId, cardProductName) {
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/product_card_events`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({
+        chat_id: chatId,
+        card_product_id: cardProductId,
+        card_product_name: cardProductName,
+        event_type: eventType
+      })
+    });
+  } catch(e) { /* fail silently */ }
+}
 const params = new URLSearchParams(window.location.search);
 const productId = params.get('product') || 'DEV-PU108';
 
