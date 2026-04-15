@@ -767,11 +767,45 @@ function parseMarkdown(text) {
 function buildProductCard(card) {
   const productMeta = {
     'Phantom Ultimate 108 dB': { subtitle: 'Full-Body Sound Technology' },
-    'Phantom Ultimate 98 dB': { subtitle: 'Signature Sound, Compact Form' },
-    'Devialet Mania': { subtitle: '360° Stereo Sound' },
-    'Devialet Gemini II': { subtitle: 'Adaptive Noise Cancellation' },
-    'Devialet Dione': { subtitle: 'Dolby Atmos 5.1.2 Soundbar' },
+    'Phantom Ultimate 98 dB':  { subtitle: 'Signature Sound, Compact Form' },
+    'Devialet Mania':           { subtitle: '360° Stereo Sound' },
+    'Devialet Gemini II':       { subtitle: 'Adaptive Noise Cancellation' },
+    'Devialet Dione':           { subtitle: 'Dolby Atmos 5.1.2 Soundbar' },
   };
+  const meta = productMeta[card.name] || { subtitle: '' };
+  let imgUrl = card.image;
+  if (imgUrl && imgUrl.includes('background=')) {
+    imgUrl = imgUrl.replace(/background=[a-fA-F0-9]+/, 'background=ffffff');
+  }
+
+  const cardProductId = productNameToId[card.name] || card.name;
+  trackCardEvent('impression', cardProductId, card.name);
+
+  const div = document.createElement('div');
+  div.className = 'product-card';
+  div.innerHTML = `
+    <div class="product-card-img">
+      <img src="${imgUrl}" alt="${card.name}" onerror="this.style.display='none';">
+    </div>
+    <div class="product-card-body">
+      <div class="product-card-name">${card.name}</div>
+      <div class="product-card-subtitle">${meta.subtitle}</div>
+      <div class="product-card-price-row">
+        <div class="product-card-price">${card.price}</div>
+      </div>
+      ${card.url ? `<a href="${card.url}" target="_blank" rel="noopener" class="product-card-btn">Buy</a>` : ''}
+    </div>
+  `;
+
+  const buyBtn = div.querySelector('.product-card-btn');
+  if (buyBtn) {
+    buyBtn.addEventListener('click', () => {
+      trackCardEvent('click', cardProductId, card.name);
+    });
+  }
+
+  return div;
+}
 
   const meta = productMeta[card.name] || { subtitle: '' };
 
