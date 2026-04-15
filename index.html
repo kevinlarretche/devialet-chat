@@ -710,9 +710,9 @@ function detectCountry() {
       'Australia/Sydney': 'AU', 'Australia/Melbourne': 'AU',
       'Pacific/Auckland': 'NZ',
     };
-    return tzCountry[tz] || regionFromLocale.toUpperCase() || 'US';
+    return tzCountry[tz] || regionFromLocale.toUpperCase() || 'FR';
   } catch(e) {
-    return 'US';
+    return 'FR';
   }
 }
 
@@ -725,7 +725,7 @@ function getCurrency(country) {
     'SG': 'SGD', 'CN': 'CNY', 'TH': 'THB', 'ID': 'IDR',
     'AU': 'AUD', 'NZ': 'NZD', 'MX': 'MXN', 'BR': 'BRL',
   };
-  return map[country] || 'USD';
+  return map[country] || 'EUR';
 }
 
 const userCountry = detectCountry();
@@ -806,13 +806,6 @@ function buildProductCard(card) {
 
   return div;
 }
-
-  const meta = productMeta[card.name] || { subtitle: '' };
-
-  let imgUrl = card.image;
-  if (imgUrl && imgUrl.includes('background=')) {
-    imgUrl = imgUrl.replace(/background=[a-fA-F0-9]+/, 'background=ffffff');
-  }
 
   const div = document.createElement('div');
   div.className = 'product-card';
