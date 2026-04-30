@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
 <title>Devialet Support</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -21,8 +21,14 @@
     --bubble-user: #1e1e1e;
     --bubble-bot: #161616;
     --success: #2ecc71;
+    --app-height: 100vh;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 100%;
+    overflow-x: hidden;
+    overscroll-behavior: none;
+  }
   body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     background: var(--bg-primary);
@@ -30,8 +36,14 @@
     display: flex;
     flex-direction: column;
     height: 100vh;
+    height: 100dvh;
     overflow: hidden;
     -webkit-font-smoothing: antialiased;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
   }
   .header {
     background: var(--bg-primary);
@@ -43,6 +55,10 @@
     justify-content: space-between;
     flex-shrink: 0;
     z-index: 50;
+    padding-top: env(safe-area-inset-top);
+    padding-left: max(24px, env(safe-area-inset-left));
+    padding-right: max(24px, env(safe-area-inset-right));
+    box-sizing: content-box;
   }
   .header-left { display: flex; align-items: center; gap: 16px; }
   .brand-mark { display: flex; align-items: center; gap: 14px; }
@@ -62,14 +78,29 @@
   }
   .icon-btn:hover { color: var(--text-primary); background: var(--accent-dim); }
   .chat-window {
-    flex: 1; overflow-y: auto; padding: 32px 24px;
-    display: flex; flex-direction: column; gap: 24px;
-    scrollbar-width: thin; scrollbar-color: var(--bg-elevated) transparent;
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 32px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--bg-elevated) transparent;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    max-width: 100%;
   }
   .chat-window::-webkit-scrollbar { width: 4px; }
   .chat-window::-webkit-scrollbar-track { background: transparent; }
   .chat-window::-webkit-scrollbar-thumb { background: var(--bg-elevated); border-radius: 2px; }
-  .message-wrapper { display: flex; flex-direction: column; animation: fadeUp 0.35s ease forwards; }
+  .message-wrapper {
+    display: flex;
+    flex-direction: column;
+    animation: fadeUp 0.35s ease forwards;
+    width: 100%;
+    max-width: 100%;
+  }
   .message-wrapper.user { align-items: flex-end; }
   .message-wrapper.bot { align-items: flex-start; }
   @keyframes fadeUp {
@@ -82,7 +113,16 @@
     display: flex; align-items: center; gap: 6px;
   }
   .bot-label::before { content: ''; display: block; width: 14px; height: 1px; background: var(--text-muted); }
-  .message { padding: 14px 18px; font-size: 14px; line-height: 1.65; max-width: 78%; position: relative; }
+  .message {
+    padding: 14px 18px;
+    font-size: 14px;
+    line-height: 1.65;
+    max-width: 78%;
+    position: relative;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
   .message.user {
     background: var(--bubble-user); border: 1px solid var(--border);
     border-radius: 12px 12px 2px 12px; color: var(--text-primary); font-weight: 400;
@@ -96,7 +136,7 @@
   .message.bot ul { padding-left: 16px; margin: 8px 0; }
   .message.bot ol { padding-left: 16px; margin: 8px 0; }
   .message.bot li { margin: 4px 0; color: var(--text-secondary); }
-  .message.bot a { color: white; text-decoration: underline; text-underline-offset: 3px; }
+  .message.bot a { color: white; text-decoration: underline; text-underline-offset: 3px; word-break: break-all; }
   .message.bot code { background: var(--bg-elevated); padding: 1px 6px; border-radius: 3px; font-size: 12px; font-family: monospace; color: #aaa; }
   .message.bot p { margin-bottom: 8px; }
   .message.bot p:last-child { margin-bottom: 0; }
@@ -126,14 +166,23 @@
     0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
     40% { opacity: 1; transform: scale(1); }
   }
-  .footer-container { background: var(--bg-primary); border-top: 1px solid var(--border); padding: 16px 24px 24px; flex-shrink: 0; }
-  .quick-replies { display: flex; gap: 8px; margin-bottom: 14px; overflow-x: auto; scrollbar-width: none; }
+  .footer-container {
+    background: var(--bg-primary);
+    border-top: 1px solid var(--border);
+    padding: 16px 24px 24px;
+    flex-shrink: 0;
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
+    padding-left: max(24px, env(safe-area-inset-left));
+    padding-right: max(24px, env(safe-area-inset-right));
+  }
+  .quick-replies { display: flex; gap: 8px; margin-bottom: 14px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
   .quick-replies::-webkit-scrollbar { display: none; }
   .qr-btn {
     background: transparent; border: 1px solid var(--border); color: var(--text-secondary);
     padding: 7px 14px; border-radius: 3px; font-size: 10px; font-weight: 600;
     letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; white-space: nowrap;
     font-family: 'Inter', sans-serif; transition: all 0.15s ease;
+    flex-shrink: 0;
   }
   .qr-btn:hover { border-color: var(--border-hover); color: var(--text-primary); background: var(--accent-dim); }
   .input-wrapper {
@@ -143,9 +192,18 @@
   }
   .input-wrapper:focus-within { border-color: var(--border-hover); }
   .input-wrapper input {
-    flex: 1; background: transparent; border: none; outline: none;
-    font-size: 13px; font-weight: 400; color: var(--text-primary);
-    font-family: 'Inter', sans-serif; letter-spacing: 0.01em; padding: 10px 0;
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.01em;
+    padding: 10px 0;
+    min-width: 0;
+    width: 100%;
   }
   .input-wrapper input::placeholder { color: var(--text-muted); }
   .send-btn-wrapper { position: relative; width: 40px; height: 40px; flex-shrink: 0; }
@@ -193,6 +251,36 @@
   .lang-option .lang-flag { font-size: 14px; line-height: 1; }
   .lang-option .lang-check { margin-left: auto; opacity: 0; font-size: 10px; color: var(--text-muted); }
   .lang-option.active .lang-check { opacity: 1; }
+
+  /* Mobile optimisations */
+  @media (max-width: 640px) {
+    .header {
+      padding: 0 16px;
+      padding-left: max(16px, env(safe-area-inset-left));
+      padding-right: max(16px, env(safe-area-inset-right));
+      height: 56px;
+    }
+    .chat-window {
+      padding: 20px 16px;
+      gap: 18px;
+    }
+    .footer-container {
+      padding: 12px 16px 16px;
+      padding-bottom: max(16px, env(safe-area-inset-bottom));
+      padding-left: max(16px, env(safe-area-inset-left));
+      padding-right: max(16px, env(safe-area-inset-right));
+    }
+    .message {
+      max-width: 88%;
+      padding: 12px 14px;
+      font-size: 14px;
+    }
+    .product-card { max-width: 100%; }
+    .input-wrapper { padding: 4px 4px 4px 14px; }
+    .qr-btn { padding: 8px 12px; }
+    .powered-by { margin-top: 10px; }
+    .brand-logo svg { width: 110px; height: auto; }
+  }
 </style>
 </head>
 <body>
@@ -258,7 +346,7 @@
 <div class="footer-container">
   <div class="quick-replies" id="quick-replies"></div>
   <div class="input-wrapper">
-    <input type="text" id="input" placeholder="Ask anything about your Devialet..." autocomplete="off">
+    <input type="text" id="input" placeholder="Ask anything about your Devialet..." autocomplete="off" autocapitalize="sentences" autocorrect="on">
     <div class="send-btn-wrapper" id="send-wrapper">
       <div class="wave-ring"></div>
       <div class="wave-ring"></div>
@@ -279,7 +367,6 @@
 <script>
 const SUPABASE_URL = 'https://sygsovgnxlrsdqzwhdyc.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_EVCnH60x4JDU1Qlk5uZqBw_i3fmjTan';
-
 const productNameToId = {
   'Phantom Ultimate 108 dB': 'DEV-PU108',
   'Phantom Ultimate 98 dB':  'DEV-PU98',
@@ -327,7 +414,9 @@ const questionsPerLang = {
 let chatId = 'dev_' + Math.random().toString(36).substr(2, 9);
 let currentLang = 'en';
 let isSending = false;
-function detectCountry() {
+
+/* ---------- Country detection ---------- */
+function detectCountryFromTimezone() {
   try {
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
     const locale = navigator.language || 'en-US';
@@ -335,7 +424,7 @@ function detectCountry() {
     const tzCountry = {
       'Asia/Hong_Kong': 'HK', 'Asia/Taipei': 'TW', 'Asia/Tokyo': 'JP',
       'Asia/Seoul': 'KR', 'Asia/Singapore': 'SG', 'Asia/Shanghai': 'CN',
-      'Asia/Bangkok': 'TH', 'Asia/Jakarta': 'ID',
+      'Asia/Bangkok': 'TH', 'Asia/Jakarta': 'ID', 'Asia/Macau': 'MO',
       'Europe/Paris': 'FR', 'Europe/London': 'GB', 'Europe/Berlin': 'DE',
       'Europe/Madrid': 'ES', 'Europe/Rome': 'IT', 'Europe/Zurich': 'CH',
       'Europe/Amsterdam': 'NL', 'Europe/Brussels': 'BE',
@@ -351,28 +440,78 @@ function detectCountry() {
     return 'FR';
   }
 }
+
+async function detectCountryFromIP() {
+  /* Try multiple providers, take first that succeeds */
+  const providers = [
+    async () => {
+      const r = await fetch('https://api.country.is/', { cache: 'no-store' });
+      if (!r.ok) throw new Error('country.is failed');
+      const d = await r.json();
+      return d.country;
+    },
+    async () => {
+      const r = await fetch('https://ipapi.co/country/', { cache: 'no-store' });
+      if (!r.ok) throw new Error('ipapi.co failed');
+      const t = (await r.text()).trim();
+      if (!/^[A-Z]{2}$/.test(t)) throw new Error('bad country code');
+      return t;
+    },
+    async () => {
+      const r = await fetch('https://www.cloudflare.com/cdn-cgi/trace', { cache: 'no-store' });
+      if (!r.ok) throw new Error('cloudflare failed');
+      const t = await r.text();
+      const match = t.match(/loc=([A-Z]{2})/);
+      if (!match) throw new Error('no loc in trace');
+      return match[1];
+    }
+  ];
+  const timeout = (ms) => new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), ms));
+  for (const p of providers) {
+    try {
+      const country = await Promise.race([p(), timeout(2500)]);
+      if (country && /^[A-Z]{2}$/.test(country)) return country;
+    } catch(e) { /* try next */ }
+  }
+  return null;
+}
+
 function getCurrency(country) {
   const map = {
     'US': 'USD', 'CA': 'CAD', 'GB': 'GBP',
     'FR': 'EUR', 'DE': 'EUR', 'ES': 'EUR', 'IT': 'EUR',
     'NL': 'EUR', 'BE': 'EUR', 'CH': 'CHF',
-    'HK': 'HKD', 'TW': 'TWD', 'JP': 'JPY', 'KR': 'KRW',
+    'HK': 'HKD', 'MO': 'HKD', 'TW': 'TWD', 'JP': 'JPY', 'KR': 'KRW',
     'SG': 'SGD', 'CN': 'CNY', 'TH': 'THB', 'ID': 'IDR',
     'AU': 'AUD', 'NZ': 'NZD', 'MX': 'MXN', 'BR': 'BRL',
   };
   return map[country] || 'EUR';
 }
-const userCountry = detectCountry();
-const userCurrency = getCurrency(userCountry);
+
+let userCountry = detectCountryFromTimezone();
+let userCurrency = getCurrency(userCountry);
+
+/* Try to upgrade to IP-based detection in the background */
+(async () => {
+  const ipCountry = await detectCountryFromIP();
+  if (ipCountry) {
+    userCountry = ipCountry;
+    userCurrency = getCurrency(ipCountry);
+  }
+})();
+
+/* ---------- DOM refs ---------- */
 const chat = document.getElementById('chat');
 const input = document.getElementById('input');
 const sendWrapper = document.getElementById('send-wrapper');
+
 function triggerWave() {
   sendWrapper.classList.remove('rippling');
   void sendWrapper.offsetWidth;
   sendWrapper.classList.add('rippling');
   setTimeout(() => sendWrapper.classList.remove('rippling'), 800);
 }
+
 function parseMarkdown(text) {
   let html = text
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -393,6 +532,7 @@ function parseMarkdown(text) {
     return `<p>${t}</p>`;
   }).filter(Boolean).join('\n');
 }
+
 function buildProductCard(card) {
   const productMeta = {
     'Phantom Ultimate 108 dB': { subtitle: 'Full-Body Sound Technology' },
@@ -431,6 +571,7 @@ function buildProductCard(card) {
   }
   return div;
 }
+
 function addMsg(text, type, card = null) {
   const wrapper = document.createElement('div');
   wrapper.className = `message-wrapper ${type}`;
@@ -455,8 +596,15 @@ function addMsg(text, type, card = null) {
   timeDiv.textContent = time;
   wrapper.appendChild(timeDiv);
   chat.appendChild(wrapper);
-  chat.scrollTop = chat.scrollHeight;
+  scrollChatToBottom();
 }
+
+function scrollChatToBottom() {
+  requestAnimationFrame(() => {
+    chat.scrollTop = chat.scrollHeight;
+  });
+}
+
 function showTyping() {
   const div = document.createElement('div');
   div.id = 'typing';
@@ -470,8 +618,9 @@ function showTyping() {
   msg.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
   div.appendChild(msg);
   chat.appendChild(div);
-  chat.scrollTop = chat.scrollHeight;
+  scrollChatToBottom();
 }
+
 async function handleSend(textOverride) {
   const text = textOverride || input.value.trim();
   if (!text || isSending) return;
@@ -487,7 +636,14 @@ async function handleSend(textOverride) {
     const res = await fetch(CONFIG.webhook, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: text, productId, chatId, language: currentLang, country: userCountry, currency: userCurrency })
+      body: JSON.stringify({
+        message: text,
+        productId,
+        chatId,
+        language: currentLang,
+        country: userCountry,
+        currency: userCurrency
+      })
     });
     const data = await res.json();
     if (document.getElementById('typing')) document.getElementById('typing').remove();
@@ -503,9 +659,13 @@ async function handleSend(textOverride) {
     isSending = false;
     input.disabled = false;
     document.getElementById('send-btn').disabled = false;
-    input.focus();
+    /* Avoid input.focus() on mobile after send to prevent layout jumps */
+    if (!('ontouchstart' in window) && window.innerWidth > 640) {
+      input.focus();
+    }
   }
 }
+
 function init() {
   chat.innerHTML = '';
   addMsg(CONFIG.welcome, 'bot');
@@ -521,12 +681,23 @@ function init() {
     qr.appendChild(b);
   });
 }
-document.getElementById('send-btn').onclick = () => handleSend();
-input.onkeypress = e => { if (e.key === 'Enter') handleSend(); };
+
+document.getElementById('send-btn').onclick = (e) => {
+  e.preventDefault();
+  handleSend();
+};
+input.addEventListener('keypress', e => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    handleSend();
+  }
+});
+
 document.getElementById('restart-btn').onclick = () => {
   chatId = 'dev_' + Math.random().toString(36).substr(2, 9);
   init();
 };
+
 const langBtn = document.getElementById('lang-btn');
 const langDropdown = document.getElementById('lang-dropdown');
 langBtn.onclick = (e) => {
@@ -554,6 +725,20 @@ document.querySelectorAll('.lang-option').forEach(opt => {
     init();
   };
 });
+
+/* Keep chat scrolled to bottom when keyboard opens/closes on mobile */
+window.addEventListener('resize', () => {
+  scrollChatToBottom();
+});
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', scrollChatToBottom);
+}
+
+/* Prevent any horizontal scroll/drift on the chat window */
+chat.addEventListener('scroll', () => {
+  if (chat.scrollLeft !== 0) chat.scrollLeft = 0;
+});
+
 init();
 </script>
 </body>
